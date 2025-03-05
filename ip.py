@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 import os
+from tkinter import filedialog, messagebox
 
 class FluxoDeCaixaApp:
     def __init__(self, root):
@@ -200,6 +201,8 @@ class FluxoDeCaixaApp:
         self.fig_distribuicao = plt.Figure(figsize=(5, 4), dpi=100)
         self.canvas_distribuicao = FigureCanvasTkAgg(self.fig_distribuicao, self.frame_grafico_distribuicao)
         self.canvas_distribuicao.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        self.btn_importar = ttk.Button(self.frame_botoes, text="Importar Excel", command=self.importar_excel)
+        self.btn_importar.grid(row=0, column=5, padx=5, pady=5)
         
     def carregar_transacoes(self):
         # Limpar tabela
@@ -713,7 +716,101 @@ class FluxoDeCaixaApp:
         # Atualizar canvas
         self.canvas_distribuicao.draw()
 
-    
+    def importar_excel(self):
+        # Abrir diálogo de seleção de arquivo
+        arquivo = filedialog.askopenfilename(
+            title="Selecionar Planilha Excel",
+            filetypes=[("Arquivos Excel", "*.xlsx *.xls *.csv")]
+        )
+        
+        if not arquivo:
+            return  # Usuário cancelou
+        
+        try:
+            # Ler arquivo Excel
+            df = pd.read_excel(arquivo)
+            
+            # Validar colunas
+            colunas_esperadas = ['Tipo', 'Data', 'lançamento', 'Valor', 'Categoria', 'Lançamento Original', 'REF']
+            
+            for coluna in colunas_esperadas:
+                if coluna not in df.columns:
+                    messagebox.showerror("Erro", f"Coluna '{coluna}' não encontrada na planilha.")
+                    return
+            
+            # Contador de importações
+            importados = 0
+            erro_categoria = []
+            
+            # Iniciar transação no banco de dados
+            try:
+                # Processar cada linha
+                for _, linha in df.iterrows():
+                    # Validar e converter data
+                    try:
+                        data = pd.to_datetime(linha['Data']).strftime('%Y-%m-%d')
+                    except:
+                        # Se não conseguir converter, pular linha
+                        continue
+                    
+                    # Converter tipo para formato do banco
+                    tipo = 'entrada' if str(linha['Tipo']).lower() in ['entrada', 'receita', '+'] else 'saida'
+                    
+                    # Verificar se a categoria existe
+                    self.cursor.execute("SELECT id FROM categorias WHERE nome = ? AND tipo = ?", 
+                                        (linha['Categoria'], tipo))
+                    categoria_existe = self.cursor.fetchone()
+                    
+                    if not categoria_existe:
+                        # Adicionar à lista de categorias não encontradas
+                        erro_categoria.append(f"{linha['Categoria']} ({tipo})")
+                        continue
+                    
+                    categoria_id = categoria_existe[0]
+                    
+                    # Inserir transação
+                    try:
+                        self.cursor.execute("""
+                        INSERT INTO transacoes 
+                        (data, descricao, categoria_id, valor, tipo) 
+                        VALUES (?, ?, ?, ?, ?)
+                        """, (
+                            data, 
+                            linha['lançamento'], 
+                            categoria_id, 
+                            float(str(linha['Valor']).replace(',', '.')), 
+                            tipo
+                        ))
+                        importados += 1
+                    except Exception as e:
+                        # Log de erro para linhas que não puderam ser importadas
+                        print(f"Erro ao importar linha: {e}")
+                
+                # Confirmar transações
+                self.conn.commit()
+                
+                # Mensagem de sucesso
+                mensagem = f"{importados} transações importadas com sucesso!"
+                
+                # Adicionar aviso de categorias não encontradas, se houver
+                if erro_categoria:
+                    # Remover duplicatas
+                    erro_categoria = list(set(erro_categoria))
+                    mensagem += f"\n\nCategorias não encontradas:\n" + "\n".join(erro_categoria)
+                
+                messagebox.showinfo("Importação Concluída", mensagem)
+                
+                # Recarregar dados
+                self.carregar_transacoes()
+                self.atualizar_saldo()
+                
+            except Exception as e:
+                self.conn.rollback()
+                messagebox.showerror("Erro", f"Erro durante a importação: {str(e)}")
+        
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao ler arquivo: {str(e)}")
+
     def abrir_gerenciador_categorias(self):
         # Criar janela
         janela = tk.Toplevel(self.root)
