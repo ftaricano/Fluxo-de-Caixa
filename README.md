@@ -1,134 +1,102 @@
-# Gerenciador de Fluxo de Caixa 💰
+# Gerenciador de Fluxo de Caixa
 
-## Descrição do Projeto
+Uma aplicação desktop para gerenciamento de fluxo de caixa, desenvolvida em Python com interface gráfica usando Tkinter.
 
-Este é um aplicativo de gerenciamento de fluxo de caixa desenvolvido em Python usando Tkinter para interface gráfica, SQLite para armazenamento de dados e Matplotlib para visualização de gráficos.
+## Funcionalidades
 
-### Funcionalidades Principais
-
-- 📊 Registro de transações de entrada e saída
-- 📈 Visualização de gráficos de fluxo de caixa mensal
-- 🍕 Distribuição de despesas por categoria
-- 📑 Gerenciamento de categorias personalizadas
-- 📥 Importação de dados via planilha Excel
-- 💾 Persistência de dados em banco SQLite
+- Cadastro de entradas e saídas financeiras
+- Categorização de transações
+- Visualização de saldo atual
+- Gráficos de fluxo mensal e distribuição de despesas
+- Filtros por mês, ano e tipo de transação
+- Importação de dados via Excel
+- Gerenciamento de categorias
 
 ## Requisitos
 
-- Python 3.8+
-- Bibliotecas:
-  - tkinter
-  - sqlite3
-  - matplotlib
-  - pandas
-  - openpyxl
+- Python 3.8 ou superior
+- Bibliotecas listadas em `requirements.txt`
 
 ## Instalação
 
-1. Clone o repositório:
+1. Clone este repositório:
 ```bash
-git clone https://github.com/seu-usuario/gerenciador-fluxo-caixa.git
-cd gerenciador-fluxo-caixa
+git clone https://github.com/seu-usuario/fluxo-de-caixa.git
+cd fluxo-de-caixa
 ```
 
 2. Crie um ambiente virtual (opcional, mas recomendado):
 ```bash
 python -m venv venv
-source venv/bin/activate  # No Windows use: venv\Scripts\activate
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 ```
 
 3. Instale as dependências:
 ```bash
-pip install matplotlib pandas openpyxl
+pip install -r requirements.txt
 ```
 
-## Como Usar
+## Uso
 
-### Iniciando o Aplicativo
+Para iniciar a aplicação, execute:
 ```bash
-python fluxo_caixa.py
+python main.py
 ```
 
-### Funcionalidades
+### Principais funcionalidades
 
-#### Adicionar Transações
-- Clique em "+ Entrada" ou "+ Saída"
-- Preencha os dados: data, descrição, categoria e valor
-- Salve a transação
+1. **Adicionar Transação**
+   - Clique em "+ Nova Entrada" ou "+ Nova Saída"
+   - Preencha os campos do formulário
+   - Clique em "Salvar"
 
-#### Gerenciar Categorias
-- Acesse "Gerenciar Categorias"
-- Adicione, edite ou exclua categorias de entrada e saída
+2. **Visualizar Gráficos**
+   - O gráfico de fluxo mensal mostra entradas e saídas dos últimos 12 meses
+   - O gráfico de distribuição mostra a proporção das despesas por categoria
 
-#### Filtrar Transações
-- Filtre por mês, ano ou tipo de transação
-- Visualize o saldo e gráficos atualizados
+3. **Filtrar Dados**
+   - Use os filtros no topo da tela para filtrar por mês, ano e tipo de transação
+   - Os gráficos e a tabela serão atualizados automaticamente
 
-#### Importar Planilha Excel
-- Clique em "Importar Excel"
-- Selecione uma planilha com as colunas:
-  - Tipo
-  - Data
-  - Lançamento
-  - Valor
-  - Categoria
-  - Lançamento Original
-  - REF
+4. **Gerenciar Categorias**
+   - Clique em "Gerenciar Categorias" para adicionar, editar ou excluir categorias
+   - As categorias são separadas entre entradas e saídas
+
+5. **Importar Dados**
+   - Clique em "Importar Excel" para importar transações de um arquivo Excel
+   - O arquivo deve seguir o formato especificado na janela de importação
 
 ## Estrutura do Projeto
 
 ```
-gerenciador-fluxo-caixa/
-│
-├── fluxo_caixa.py      # Arquivo principal
-├── data/               # Diretório de dados
-│   └── fluxo_caixa.db  # Banco de dados SQLite
-└── README.md           # Este arquivo
+fluxo-de-caixa/
+├── data/               # Diretório para armazenar o banco de dados
+├── ui/                 # Interface do usuário
+│   ├── __init__.py
+│   ├── main_window.py  # Janela principal
+│   ├── transaction_form.py  # Formulário de transações
+│   └── category_manager.py  # Gerenciador de categorias
+├── utils/             # Utilitários
+│   ├── __init__.py
+│   ├── graph_utils.py # Funções para gráficos
+│   └── excel_importer.py # Importação de Excel
+├── database.py        # Gerenciamento do banco de dados
+├── main.py           # Ponto de entrada da aplicação
+├── requirements.txt  # Dependências do projeto
+└── README.md        # Este arquivo
 ```
 
-## Personalização
+## Contribuição
 
-### Categorias Padrão
-O aplicativo já vem com categorias padrão:
+Contribuições são bem-vindas! Sinta-se à vontade para:
 
-Entradas:
-- Vendas
-- Serviços
-- Investimentos
-- Outras Receitas
-
-Saídas:
-- Materiais
-- Salários
-- Aluguel
-- Impostos
-- Fornecedores
-- Despesas Operacionais
-- Outras Despesas
-
-## Contribuições
-
-1. Faça um fork do projeto
-2. Crie sua branch de feature (`git checkout -b feature/novaFeature`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/novaFeature`)
-5. Abra um Pull Request
+1. Fazer um fork do projeto
+2. Criar uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abrir um Pull Request
 
 ## Licença
 
-[Especifique a licença - por exemplo, MIT]
-
-## Contato
-
-[Seu nome ou informações de contato]
-
-## Capturas de Tela
-
-[Adicione algumas capturas de tela do aplicativo mostrando suas principais funcionalidades]
-
-## Próximos Passos
-
-- [ ] Implementar exportação de relatórios
-- [ ] Adicionar gráficos de projeção
-- [ ] Melhorar validações de entrada
-- [ ] Criar modo de visualização de relatórios
+Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para detalhes.
